@@ -1,2 +1,6 @@
 # bs-leads-widget-js
-front-end for amocrm widget
+Front-end for amocrm widget.
+
+Widget distributes leads to managers.
+
+Webpage of widget: https://bizandsoft.ru/vidzhety-amo/raspredelenie-sdelok
