@@ -1,6 +1,6 @@
 define(['jquery', 'lib/components/base/modal'], function($, Modal){
 	var CustomWidget = function () {
-		var self = this, system = self.system(), widgetTca = 'bizandsoft_leads', widgetPath = 'autotags', currentUser = $('.n-avatar').first().attr('id'), serverName = 'wdg.biz-crm.ru';
+		var self = this, system = self.system(), widgetTca = 'bizandsoft_leads', widgetPath = 'bs-leads', currentUser = $('.n-avatar').first().attr('id'), serverName = 'wdg.biz-crm.ru';
 
 		self.setCookie =	function(name, value, options = {})
 		{
