@@ -1,0 +1,97 @@
+.bizandsoft_leads_ac-form {
+	background-color:#fff !important;
+	margin:0;
+	width:265px;
+	margin-left:-10px !important;
+	padding:14px;
+}
+.bizandsoft_leads_mgc-modal {
+    margin-top: 0;
+}
+.bizandsoft_leads_mgc-template-modal {
+    margin-top: 0;
+}
+.bizandsoft_leads_js-ac-caption {
+    display: block;
+    margin: auto;
+    background-color: #226FBD;
+    border-bottom: 1px solid gray;
+}
+.bizandsoft_leads-action__header h2 {
+    display: inline-block;
+}
+.bizandsoft_leads-action__top-controls {
+    float: right;
+}
+#bizandsoft_leads_result {
+  margin-top: 70px;
+}
+.bizandsoft_leads_ac_sub {
+	color:#fff;
+	padding:5px;
+	background-color:#23c48e;
+	margin-bottom:7px;
+	border:1px solid #4bb18c;
+	border-radius:3px;
+	width:190px;
+}
+.bizandsoft_leads_ac_sub:hover {
+	border:1px solid #4bb18c;
+	background-color:#4bb18c;
+}
+.bizandsoft_leads_ac_sub a:link, .bizandsoft_leads_ac_sub a:visited {
+	color:#fff;
+	text-decoration:none;
+}
+.bizandsoft_leads_sdk {
+	background-image: url('https://amo.bizandsoft.ru/assets/images/sdk_preloader.gif');
+	background-position: center center;
+	background-repeat: no-repeat;
+	padding: 10px;
+}
+div.bizandsoft_leads_mgc-modal > * div.modal-body {
+	padding: 0 !important;
+	border:0 !important;
+	width: 675px !important;
+}
+.bizandsoft_leads-action__caption {
+	font-size:15pt;
+	margin-top:20px;
+	margin-left:16px;
+}
+
+.modal-body__inner #bizandsoft_leads_result {
+	display:none;
+	padding:10px !important;
+	margin-top:0;
+}
+.modal-body__inner.transit #bizandsoft_leads_result {
+	-webkit-transition: 3s;
+	-moz-transition: 3s;
+	-ms-transition: 3s;
+	-o-transition: 3s;
+	transition: 3s;
+	display: block;
+}
+div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye {
+	color:#2ac38d !important;
+	font-size:16pt !important;
+	border:1px solid #2ac38d !important;
+	border-radius:50%;
+	padding:0;
+	margin:0 !important;
+	text-align:center;
+	width: 24px !important;
+	height: 24px !important;
+}
+div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
+	background-color:#2ac38d !important;
+	color:#213d49 !important;
+	border:1px solid #213d49 !important;
+}
+.bizandsoft_leads-section_warning {
+	margin-bottom: 10px;
+	padding: 8px;
+	border-radius: 4px;
+	background-color: #E74C3C;
+}

@@ -1,0 +1,58 @@
+<div class="form-group">
+	<div class="form-group__title">Выбрать группу для распределения</div>
+	<div class="form-group__control">
+		{% set masterCheckboxClass = null %}
+		{% if users.checked > 0 %}
+			{% if users.checked < users.total %}
+				{% set masterCheckboxClass = 'icon-check-minus' %}
+			{% else %}
+				{% set masterCheckboxClass = 'icon-checkbox-checked' %}
+			{% endif %}
+		{% endif %}
+
+		{{ self.render(
+			{ref: '/tmpl/controls/checkboxes_dropdown.twig'},
+			{
+				class_name            : users_class,
+				master_checkbox_class : masterCheckboxClass,
+				selected              : null,
+				title_numeral         : 'менеджер,менеджера,менеджеров,менеджеры',
+				title_empty           : 'Выберите менеджеров',
+				title                 : 'Выберите менеджеров',
+				name                  : null,
+				need_escape           : false,
+				items                 : users.items
+			}
+		) }}
+	</div>
+
+
+	<div class="form-group__title">Выбрать от каких создателей распределяем</div>
+	<div class="form-group__control">
+		{% set masterCheckboxClassCreators = null %}
+		{% if creators.checked > 0 %}
+			{% if creators.checked < creators.total %}
+				{% set masterCheckboxClassCreators = 'icon-check-minus' %}
+			{% else %}
+				{% set masterCheckboxClassCreators = 'icon-checkbox-checked' %}
+			{% endif %}
+		{% endif %}
+
+		{{ self.render(
+			{ref: '/tmpl/controls/checkboxes_dropdown.twig'},
+			{
+				class_name            : creators_class,
+				master_checkbox_class : masterCheckboxClassCreators,
+				selected              : null,
+				title_numeral         : 'создатель,создателя,создателей,создатели',
+				title_empty           : 'Выберите создателей',
+				title                 : 'Выберите создателей',
+				name                  : null,
+				need_escape           : false,
+				items                 : creators.items
+			}
+		) }}
+	</div>
+
+
+</div>

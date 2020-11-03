@@ -1,0 +1,61 @@
+{
+	"widget": {
+		"name": "widget.name",
+		"description": "widget.description",
+		"short_description": "widget.short_description",
+		"version": "0.136",
+		"interface_version": 2,
+		"init_once": false,
+		"locale": [
+			"ru"
+		],
+		"installation": true,
+		"support": {
+			"link": "https://bizandsoft.ru/",
+			"email": "amocrm@bizandsoft.ru"
+		}
+	},
+	"tour": {
+		"is_tour": true,
+		"tour_images": {
+			"ru": [
+				"/images/tour_1_ru.png",
+				"/images/tour_2_ru.png"
+			]
+		},
+		"tour_description": "widget.tour_description"
+	},
+	"locations": [
+		"lcard-1",
+		"settings",
+		"digital_pipeline"
+	],
+	"dp": {
+	"action_multiple": true,
+	"webhook_url": "https://wdg.biz-crm.ru/autotags/webhook",
+	"settings": {
+			"user_ids": {
+					"name": "settings.user_ids",
+					"type": "text",
+					"required": false
+			},
+			"creator_ids": {
+					"name": "settings.creator_ids",
+					"type": "text",
+					"required": false
+			}
+	}
+},
+	"settings": {
+		"partner": {
+			"name": "settings.partner",
+			"type": "text",
+			"required": false
+		},
+		"customer": {
+			"name": "settings.customer",
+			"type": "text",
+			"required": false
+		}
+	}
+}
