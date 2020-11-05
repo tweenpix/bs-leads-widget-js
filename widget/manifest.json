@@ -32,7 +32,7 @@
 	],
 	"dp": {
 	"action_multiple": true,
-	"webhook_url": "https://wdg.biz-crm.ru/autotags/webhook",
+	"webhook_url": "https://leads.bizandsoft.ru/bs-leads/webhook",
 	"settings": {
 			"user_ids": {
 					"name": "settings.user_ids",
