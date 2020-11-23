@@ -1,5 +1,5 @@
 <div class="form-group">
-	<div class="form-group__title">Выбрать группу для распределения</div>
+	<div class="form-group__title"> {{ i18n_settings.user_ids }} </div>
 	<div class="form-group__control">
 		{% set masterCheckboxClass = null %}
 		{% if users.checked > 0 %}
@@ -27,7 +27,7 @@
 	</div>
 
 
-	<div class="form-group__title">Выбрать от каких создателей распределяем</div>
+	<div class="form-group__title"> {{ i18n_settings.creator_ids }} </div>
 	<div class="form-group__control">
 		{% set masterCheckboxClassCreators = null %}
 		{% if creators.checked > 0 %}
@@ -54,5 +54,25 @@
 		) }}
 	</div>
 
+	<div class="form-group__control">
+		{% if data.distribute_previously_distributed == 1 %}
+			{% set change_distribute_previously_distributed = true %}
+		{% else %}
+			{% set change_distribute_previously_distributed = false %}
+		{% endif%}
+
+
+		<div title = " {{ lang.help_distribute_previously_distributed }} "
+		class="{{ self.widgetTca }}-help_btn">?</div>
+
+		{{ self.render(
+			{ref: '/tmpl/controls/checkbox.twig'},
+			{
+				id: distribute_previously_distributed,
+				text: i18n_settings.distribute_previously_distributed,
+				checked: change_distribute_previously_distributed
+			}
+		) }}
+	</div>
 
 </div>

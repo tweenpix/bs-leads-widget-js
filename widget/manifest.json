@@ -3,7 +3,7 @@
 		"name": "widget.name",
 		"description": "widget.description",
 		"short_description": "widget.short_description",
-		"version": "0.136",
+		"version": "0.170",
 		"interface_version": 2,
 		"init_once": false,
 		"locale": [
@@ -32,7 +32,7 @@
 	],
 	"dp": {
 	"action_multiple": true,
-	"webhook_url": "https://leads.bizandsoft.ru/bs-leads/webhook",
+	"webhook_url": "https://wdg.biz-crm.ru/bs-leads/webhook",
 	"settings": {
 			"user_ids": {
 					"name": "settings.user_ids",
@@ -41,6 +41,11 @@
 			},
 			"creator_ids": {
 					"name": "settings.creator_ids",
+					"type": "text",
+					"required": false
+			},
+			"distribute_previously_distributed": {
+					"name": "settings.distribute_previously_distributed",
 					"type": "text",
 					"required": false
 			}

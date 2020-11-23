@@ -1,7 +1,8 @@
 define(['jquery', 'lib/components/base/modal'], function($, Modal){
 	var CustomWidget = function () {
-		var self = this, system = self.system(), widgetTca = 'bizandsoft_leads', widgetPath = 'bs-leads', currentUser = $('.n-avatar').first().attr('id'), serverName = 'leads.bizandsoft.ru';
+		var self = this, system = self.system(), widgetTca = 'bizandsoft_leads', widgetPath = 'bs-leads', currentUser = $('.n-avatar').first().attr('id'), serverName = 'wdg.biz-crm.ru';
 
+		self.widgetTca = widgetTca;
 		self.setCookie =	function(name, value, options = {})
 		{
 			options.path= '/';
@@ -89,6 +90,9 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 
 				var val_creator_ids = dp.find('input[name="creator_ids"]').val();
 
+				var val_distribute_previously_distributed = dp.find('input[name="distribute_previously_distributed"]').val();
+
+
 				var data = [];
 				var amoManagersAndGroups = {};
 				amoManagersAndGroups.managers = AMOCRM.constant('managers');
@@ -100,9 +104,15 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					arr_user_ids.push(uKey);
 				});
 
+				if(val_user_ids == ''){
+					var value = JSON.stringify(arr_user_ids);
+					dp.find('input[name="user_ids"]').val(value);
+				}
+
 				if(self.isJson(val_user_ids)){
 					var arr_user_ids = JSON.parse(val_user_ids);
 				}
+
 
 				data.users = arr_user_ids;
 
@@ -145,6 +155,12 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 				$.each(amoManagersAndGroups.managers, function(uKey, uVal) {
 					arr_creator_ids.push(uKey);
 				});
+
+				if(val_creator_ids == ''){
+					var value = JSON.stringify(arr_creator_ids);
+					dp.find('input[name="creator_ids"]').val(value);
+				}
+
 				if(self.isJson(val_creator_ids)){
 					var arr_creator_ids = JSON.parse(val_creator_ids);
 				}
@@ -203,6 +219,17 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					});
 				});
 
+				if(val_distribute_previously_distributed == ''){
+					val_distribute_previously_distributed = 0;
+					dp.find('input[name="distribute_previously_distributed"]').val(val_distribute_previously_distributed);
+				}
+
+
+				data.distribute_previously_distributed = val_distribute_previously_distributed;
+
+				var lang = self.i18n('userLang');
+				var i18n_settings = self.i18n('settings');
+
 				var params = {
 					users: {
 						items: items_users,
@@ -217,6 +244,9 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					data: data,
 					users_class: self.w_code + '_users',
 					creators_class: self.w_code + '_creators',
+					distribute_previously_distributed: self.w_code + '_distribute_previously_distributed',
+					lang: lang,
+					i18n_settings: i18n_settings,
 					self: self
 				};
 
@@ -240,6 +270,7 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 
 				$(document).on('change', '.' + self.w_code + '_creators input.js-item-checkbox', function () {
 					var inputs = $('.' + self.w_code + '_creators input.js-item-checkbox');
+
 					var arr = [];
 					$.each(inputs, function (i, item) {
 						if ($(item).is(':checked')) {
@@ -248,6 +279,16 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					});
 					var value = JSON.stringify(arr);
 					dp.find('input[name="creator_ids"]').val(value);
+				});
+
+				$(document).on('change', '#' + self.w_code + '_distribute_previously_distributed', function(){
+
+					var value = 0;
+					if($(this).closest('label').hasClass('is-checked')){
+						value = 1;
+					}
+
+					dp.find('input[name="distribute_previously_distributed"]').val(value);
 				});
 
 				return true;
