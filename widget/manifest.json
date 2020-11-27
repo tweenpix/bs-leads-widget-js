@@ -3,7 +3,7 @@
 		"name": "widget.name",
 		"description": "widget.description",
 		"short_description": "widget.short_description",
-		"version": "0.170",
+		"version": "0.178",
 		"interface_version": 2,
 		"init_once": false,
 		"locale": [
@@ -31,7 +31,7 @@
 		"digital_pipeline"
 	],
 	"dp": {
-	"action_multiple": true,
+	"action_multiple": false,
 	"webhook_url": "https://leads.bizandsoft.ru/bs-leads/webhook",
 	"settings": {
 			"user_ids": {

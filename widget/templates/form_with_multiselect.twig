@@ -1,5 +1,9 @@
 <div class="form-group">
 	<div class="form-group__title"> {{ i18n_settings.user_ids }} </div>
+
+	<div title = " {{ lang.help_user}} "
+	class="{{ self.widgetTca }}-help_btn">?</div>
+
 	<div class="form-group__control">
 		{% set masterCheckboxClass = null %}
 		{% if users.checked > 0 %}
@@ -28,6 +32,10 @@
 
 
 	<div class="form-group__title"> {{ i18n_settings.creator_ids }} </div>
+
+	<div title = " {{ lang.help_creator }} "
+	class="{{ self.widgetTca }}-help_btn">?</div>
+
 	<div class="form-group__control">
 		{% set masterCheckboxClassCreators = null %}
 		{% if creators.checked > 0 %}
@@ -61,10 +69,6 @@
 			{% set change_distribute_previously_distributed = false %}
 		{% endif%}
 
-
-		<div title = " {{ lang.help_distribute_previously_distributed }} "
-		class="{{ self.widgetTca }}-help_btn">?</div>
-
 		{{ self.render(
 			{ref: '/tmpl/controls/checkbox.twig'},
 			{
@@ -73,6 +77,10 @@
 				checked: change_distribute_previously_distributed
 			}
 		) }}
+
+		<div title = " {{ lang.help_distribute_previously_distributed }} "
+		class="{{ self.widgetTca }}-help_btn">?</div>
+
 	</div>
 
 </div>

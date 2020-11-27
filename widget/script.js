@@ -405,7 +405,7 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					body: '',
 					render: '\
 						<div class="' + widgetTca + '_ac-form">\
-							<div class="' + widgetTca + '-button ' + widgetTca + '_ac_sub">Настройки распределения</div>\
+							<div class="' + widgetTca + '-button ' + widgetTca + '_ac_sub">Расширенные настройки</div>\
 						</div>\
 						<link type="text/css" rel="stylesheet" href="' + self.get_settings().path + '/style.css?v='+self.get_settings().version+'">'
 				});
