@@ -101,7 +101,9 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 				var arr_user_ids = [];
 
 				$.each(amoManagersAndGroups.managers, function(uKey, uVal) {
-					arr_user_ids.push(uKey);
+					if(uVal.active) {
+						arr_user_ids.push(uKey);
+					}
 				});
 
 				if(val_user_ids == ''){
@@ -113,7 +115,6 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					var arr_user_ids = JSON.parse(val_user_ids);
 				}
 
-
 				data.users = arr_user_ids;
 
 				var items_users = [],
@@ -123,7 +124,7 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					var firstItem_users = true;
 
 					$.each(amoManagersAndGroups.managers, function(uKey, uVal) {
-						if(uVal.group == gKey) {
+						if(uVal.group == gKey && uVal.active) {
 							var is_checked = false;
 
 							data.users.forEach(function (item) {
@@ -153,7 +154,9 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 
 				var arr_creator_ids = ['0'];
 				$.each(amoManagersAndGroups.managers, function(uKey, uVal) {
-					arr_creator_ids.push(uKey);
+					if(uVal.active) {
+						arr_creator_ids.push(uKey);
+					}
 				});
 
 				if(val_creator_ids == ''){
@@ -191,7 +194,7 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					var firstItem_creators = true;
 
 					$.each(amoManagersAndGroupsForCreators.managers, function(uKey, uVal) {
-						if(uVal.group == gKey) {
+						if(uVal.group == gKey && uVal.active) {
 							var is_checked = false;
 
 							data.creators.forEach(function (item) {
