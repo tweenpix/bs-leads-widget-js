@@ -3,6 +3,53 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 		var self = this, system = self.system(), widgetTca = 'bizandsoft_leads', widgetPath = 'bs-leads', currentUser = $('.n-avatar').first().attr('id'), serverName = 'leads.bizandsoft.ru';
 
 		self.widgetTca = widgetTca;
+		
+		var api = (function ($) {
+            return {
+				getPayment: function () {
+                    return new Promise(function (resolve , reject) {
+                        $.ajax({
+                            url: 'https://' + serverName + '/' + widgetPath + '/partials/check_payment.php',
+                            method: 'POST',
+                            dataType: 'json',
+							data: {
+								'subdomain':AMOCRM.constant('account').subdomain,
+							},
+                            success: function(response) {
+                              resolve(response);
+                            },
+                            error: function(err) {
+                              reject(err);
+                            }
+                        });
+                    } )
+                },
+				paymentForm: function (phone) {
+                    return new Promise(function (resolve , reject) {
+                        $.ajax({
+                            url: 'https://' + serverName + '/' + widgetPath + '/partials/paymentForm.php',
+                            method: 'POST',
+                            dataType: 'json',
+							data: {
+								'phone': phone,
+								'subdomain': AMOCRM.constant('account').subdomain,
+								'login': AMOCRM.constant('user').login,
+								'timezone': AMOCRM.system.timezone,
+								'lang': AMOCRM.lang_id,
+							},
+                            success: function(response) {
+                              resolve(response);
+                            },
+                            error: function(err) {
+                              reject(err);
+                            }
+                        });
+                    } )
+                },
+            }
+        })($);
+		
+		
 		self.setCookie =	function(name, value, options = {})
 		{
 			options.path= '/';
@@ -65,7 +112,8 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 
 		this.callbacks = {
 			settings: function(){
-				var modal = $('.widget-settings__modal.' + self.params.widget_code);
+				var w_code = self.params.widget_code;	
+				var modal = $('.widget-settings__modal.' + w_code);
 				var save  = modal.find('button.js-widget-save');
 				var installState = self.get_install_status();
 
@@ -73,6 +121,96 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					modal.find('.widget_settings_block__controls').prepend('<div class="'+ widgetTca +'-section_warning"> Виджет не активирован! </div>');
 					save.find('.button-input-inner__text').text('Активировать виджет');
 				}
+				
+				
+				$('#'+w_code+'_custom').val(2); 
+
+				var modal = '<div class="' + widgetTca + '_payment-modal payment-modal">';
+					modal += '<div class="payment-form">';
+						
+						modal += '<p>' + self.i18n('interface').payment_info + '</p>'
+
+						modal += '<div class="payment-form-block">';
+						modal += self.render(
+							{ ref: '/tmpl/controls/input.twig' },
+							{   
+								class_name: widgetTca + '_phone',
+								name: 'phone',
+								placeholder: '+79991234567',
+							}
+						);
+						modal += self.render(
+							{ ref: '/tmpl/controls/button.twig' },
+							{
+								class_name: widgetTca + '_button-input_green',
+								text: 'Отправить',
+								type: 'button'
+							});
+
+						modal += '</div>';
+
+						modal += '</div>';
+						modal += '<div class="'+widgetTca+'_overlay"></div>';
+					modal += '</div>';
+						
+				var payment_class = '';
+				var payment_date = 'Загрузка';	
+				var payment_model = 'free';
+				
+				api.getPayment().then(function (data) {
+					payment_class = data.class;
+					payment_date = data.date_end;
+					payment_model = data.payment_model;
+					var payment_btn_name = (payment_model === 'free') ? 'Купить' : 'Оплатить';
+					if (payment_class == 'success' || payment_class == 'warning') {
+						self.setCookie(widgetTca + '_pay', 'true', {secure: true});
+					}
+					if (!payment_class || payment_class == 'danger') {
+						self.setCookie(widgetTca + '_pay', 'false', {secure: true});
+					}
+
+					var html  = '<div class="widget_settings_block__item_field">';
+							html += '<div class="widget_settings_block__title_field">';
+								html += '<div class="pay_banner">';
+									html += '<span class="subscribe '+payment_class+'">' + payment_date + '</span>';
+									html += '<span class="payment-modal-show">'+ payment_btn_name +'</span>';
+								html += (payment_model === 'free') ? '</div>' : '';
+							html += '</div>';
+						html += '</div>';
+					$('#widget_settings__fields_wrapper .widget_settings_block__controls_top').before(html);
+					$('.widget-settings .widget-settings__wrap-desc-space').append(modal);
+
+					
+					$('.payment-modal-show').on('click', function(){
+						$('.payment-modal').addClass('show');
+						$('.bizandsoft_phone').focus();
+					});
+
+					$('.'+widgetTca+'_overlay').on('click', function(){
+						$('.payment-modal').removeClass('show');
+					});
+
+					$('.payment-modal button').on('click', function(){
+						var phone = $(this).parents('.payment-form-block').find('input[name=phone]');
+						if(phone.val().length > 6){
+							api.paymentForm(phone.val()).then(function(response){
+								if(response.status){
+									$('.payment-form-block').remove();
+									$('.payment-form p').html(response.message);
+								}
+								phone.val('');
+							});
+						}else{
+							phone.effect( "shake", { 
+								direction: 'down', 
+								times: 3, 
+								distance: 3
+							   }, 500
+							);
+						}
+					});
+				});
+				
 				return true;
 			},
 
@@ -313,6 +451,40 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 			init: function () {
 				return true;
 			},
+			advancedSettings: function () {
+				var curUser = AMOCRM.constant('user');
+				var userId = curUser.id;
+				var isAdmin = false;
+				var managers = AMOCRM.constant('managers');
+				var w_code = self.get_settings().widget_code;
+				
+				if (userId in managers) {
+					if (managers[userId].is_admin === 'Y')
+						isAdmin = true;
+				}
+				
+				$('.' + widgetTca + '_sdk').remove();
+				sdkInner = self.i18n('interface').no_access;
+				if (isAdmin) {
+					var sdkInner = '\
+						<form id="form">\
+							<iframe src="https://' + serverName + '/' + widgetPath + '/config.php?\
+								dom=' + window.location.hostname.split('.')[0] + '&\
+								current=' + currentUser + '&area=advanced" \
+								style="width:100%;min-height: 2600px;max-width: 1400px;display: block;margin: 0 auto;">\
+							</iframe>\
+						</form>\
+					</div>\
+					<div id="' + widgetTca + '_result"></div>';
+				}
+				
+				var settingBiz = '\
+					<div class="' + widgetTca + '_sdk">\
+						' + sdkInner + '\
+					</div>\
+				</div>';
+				$('#work-area-'+w_code).append(settingBiz);
+			},
 			bind_actions: function () {
 				$('.' + widgetTca + '-button').on('click', function () {
 					var partner;
@@ -360,33 +532,33 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					});
 				});
 
-						var adminOnly=1;
-							if (self.getCookie(widgetTca+'_adminOnly') == undefined)
-								adminOnly=2;
-							else
-								adminOnly = self.getCookie(widgetTca+'_adminOnly');
-							if(adminOnly>0)
-								var accountData = $.getJSON(
-									'https://' + window.location.hostname.split('.')[0] + '.amocrm.ru/api/v2/account?with=users',
-									function ( response ){
-										if(response._embedded.users[currentUser].is_admin == false)
+					var adminOnly=1;
+					if (self.getCookie(widgetTca+'_adminOnly') == undefined)
+						adminOnly=2;
+					else
+						adminOnly = self.getCookie(widgetTca+'_adminOnly');
+					if(adminOnly>0)
+						var accountData = $.getJSON(
+							'https://' + window.location.hostname.split('.')[0] + '.amocrm.ru/api/v2/account?with=users',
+							function ( response ){
+								if(response._embedded.users[currentUser].is_admin == false)
+									{
+									if(adminOnly==2)
+										{
+										$.getJSON('https://' + serverName + '/' + widgetPath + '/script.php?dom=' + window.location.hostname.split('.')[0],
+										function ( response )
 											{
-											if(adminOnly==2)
+											self.setCookie(widgetTca+'_adminOnly', response.adminOnly, {secure: true,expires:86400});
+											if(response.adminOnly)
 												{
-												$.getJSON('https://' + serverName + '/' + widgetPath + '/script.php?dom=' + window.location.hostname.split('.')[0],
-												function ( response )
-													{
-													self.setCookie(widgetTca+'_adminOnly', response.adminOnly, {secure: true,expires:86400});
-													if(response.adminOnly)
-														{
-														$('.card-widgets__widget-' + self.get_settings().widget_code).html('');
-														}
-													});
-												}
-											else if(adminOnly==1)
 												$('.card-widgets__widget-' + self.get_settings().widget_code).html('');
-											}
-									});
+												}
+											});
+										}
+									else if(adminOnly==1)
+										$('.card-widgets__widget-' + self.get_settings().widget_code).html('');
+									}
+						});
 
 
 				return true;

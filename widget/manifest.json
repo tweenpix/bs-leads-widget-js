@@ -3,7 +3,7 @@
 		"name": "widget.name",
 		"description": "widget.description",
 		"short_description": "widget.short_description",
-		"version": "0.182",
+		"version": "0.179",
 		"interface_version": 2,
 		"init_once": false,
 		"locale": [
@@ -28,7 +28,8 @@
 	"locations": [
 		"lcard-1",
 		"settings",
-		"digital_pipeline"
+		"digital_pipeline",
+		"advanced_settings"
 	],
 	"dp": {
 	"action_multiple": false,
@@ -52,15 +53,13 @@
 	}
 },
 	"settings": {
-		"partner": {
-			"name": "settings.partner",
-			"type": "text",
-			"required": false
-		},
-		"customer": {
-			"name": "settings.customer",
-			"type": "text",
-			"required": false
+		"consent": {
+			"name": "settings.consent",
+			"type": "custom",
+			"required": true
 		}
+	},
+	"advanced": {
+		"title": "advanced.title"
 	}
 }
