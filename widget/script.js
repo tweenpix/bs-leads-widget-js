@@ -5,31 +5,31 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 		self.widgetTca = widgetTca;
 		
 		var api = (function ($) {
-            return {
-				getPayment: function () {
-                    return new Promise(function (resolve , reject) {
-                        $.ajax({
-                            url: 'https://' + serverName + '/' + widgetPath + '/partials/check_payment.php',
-                            method: 'POST',
-                            dataType: 'json',
+			return {
+				getPayment: function () { // проверяет оплату виджета
+					return new Promise(function (resolve , reject) {
+						$.ajax({
+							url: 'https://' + serverName + '/' + widgetPath + '/partials/check_payment.php', // путь к файл изменить на свой
+							method: 'POST',
+							dataType: 'json',
 							data: {
 								'subdomain':AMOCRM.constant('account').subdomain,
 							},
-                            success: function(response) {
-                              resolve(response);
-                            },
-                            error: function(err) {
-                              reject(err);
-                            }
-                        });
-                    } )
-                },
-				paymentForm: function (phone) {
-                    return new Promise(function (resolve , reject) {
-                        $.ajax({
-                            url: 'https://' + serverName + '/' + widgetPath + '/partials/paymentForm.php',
-                            method: 'POST',
-                            dataType: 'json',
+							success: function(response) {
+							  resolve(response);
+							},
+							error: function(err) {
+							  reject(err);
+							}
+						});
+					} )
+				},
+				paymentForm: function (phone) { // отправляет данные из формы с номером тел (кнопка - служба поддержки)
+					return new Promise(function (resolve , reject) {
+						$.ajax({
+							url: 'https://' + serverName + '/' + widgetPath + '/partials/paymentForm.php', // путь к файл изменить на свой
+							method: 'POST',
+							dataType: 'json',
 							data: {
 								'phone': phone,
 								'subdomain': AMOCRM.constant('account').subdomain,
@@ -37,17 +37,57 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 								'timezone': AMOCRM.system.timezone,
 								'lang': AMOCRM.lang_id,
 							},
-                            success: function(response) {
-                              resolve(response);
-                            },
-                            error: function(err) {
-                              reject(err);
-                            }
-                        });
-                    } )
-                },
-            }
-        })($);
+							success: function(response) {
+							  resolve(response);
+							},
+							error: function(err) {
+							  reject(err);
+							}
+						});
+					} )
+				},
+				getRates: function (widget) { // загружает тарифы
+					return new Promise(function (resolve , reject) {
+						$.ajax({
+							url: 'https://payamo.bizandsoft.ru/rate.php', // не меняем
+							method: 'POST',
+							dataType: 'json',
+							data: {
+								'widget': widget,
+								'rate_name' : 'default'
+							},
+							success: function(response) {
+							  resolve(response);
+							},
+							error: function(err) {
+							  reject(err);
+							}
+						});
+					} )
+				},
+				payment: function (rate) { // получает ссылку на страницы оплаты юкассы
+					return new Promise(function (resolve, reject) {
+						$.ajax({
+							url: 'https://payamo.bizandsoft.ru/payment.php', // не меняем
+							method: 'POST',
+							dataType: 'json',
+							data: {
+								'subdomain': AMOCRM.constant('account').subdomain,
+								'widget': widgetPath,
+								'rate': rate,
+								'rate_name' : 'default'
+							},
+							success: function (response) {
+								resolve(response);
+							},
+							error: function (err) {
+								reject(err);
+							}
+						});
+					});
+				},
+			}
+		})($);
 		
 		
 		self.setCookie =	function(name, value, options = {})
@@ -113,103 +153,178 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 		this.callbacks = {
 			settings: function(){
 				var w_code = self.params.widget_code;	
-				var modal = $('.widget-settings__modal.' + w_code);
-				var save  = modal.find('button.js-widget-save');
+				var modalAct = $('.widget-settings__modal.' + w_code);
+				var save  = modalAct.find('button.js-widget-save');
 				var installState = self.get_install_status();
 
 				if (installState == 'install' || installState == 'not_configured'){
-					modal.find('.widget_settings_block__controls').prepend('<div class="'+ widgetTca +'-section_warning"> Виджет не активирован! </div>');
+					modalAct.find('.widget_settings_block__controls').prepend('<div class="'+ widgetTca +'-section_warning"> Виджет не активирован! </div>');
 					save.find('.button-input-inner__text').text('Активировать виджет');
 				}
 				
+				modalAct.addClass('amo_'+ widgetTca);
 				
 				$('#'+w_code+'_custom').val(2); 
 
-				var modal = '<div class="' + widgetTca + '_payment-modal payment-modal">';
-					modal += '<div class="payment-form">';
-						
-						modal += '<p>' + self.i18n('interface').payment_info + '</p>'
 
-						modal += '<div class="payment-form-block">';
-						modal += self.render(
-							{ ref: '/tmpl/controls/input.twig' },
-							{   
-								class_name: widgetTca + '_phone',
-								name: 'phone',
-								placeholder: '+79991234567',
+				api.getRates(widgetPath).then(function (data) {
+					var rate_html = '<div class="rates_wrapper" style="width: 396px;">';
+
+					var period_text = '';
+					var i = 0;
+					var data_length = (Object.keys(data).length);
+
+					if(data_length){
+						data_length--;
+						$.each(data, function(month, rate){
+							if(month === 1){
+								period_text = month + ' месяц';
+							}else if(month > 1 && month < 5){
+								period_text = month + ' месяца';
+							}else if(month > 5 && month < 12){
+								period_text = month + ' месяцев';
+							}else if(month == 12){
+								period_text = '1 год';
+							}else if(month == 24){
+								period_text = '2 года';
 							}
-						);
-						modal += self.render(
-							{ ref: '/tmpl/controls/button.twig' },
-							{
-								class_name: widgetTca + '_button-input_green',
-								text: 'Отправить',
-								type: 'button'
-							});
 
-						modal += '</div>';
-
-						modal += '</div>';
-						modal += '<div class="'+widgetTca+'_overlay"></div>';
-					modal += '</div>';
-						
-				var payment_class = '';
-				var payment_date = 'Загрузка';	
-				var payment_model = 'free';
-				
-				api.getPayment().then(function (data) {
-					payment_class = data.class;
-					payment_date = data.date_end;
-					payment_model = data.payment_model;
-					var payment_btn_name = (payment_model === 'free') ? 'Купить' : 'Оплатить';
-					if (payment_class == 'success' || payment_class == 'warning') {
-						self.setCookie(widgetTca + '_pay', 'true', {secure: true});
-					}
-					if (!payment_class || payment_class == 'danger') {
-						self.setCookie(widgetTca + '_pay', 'false', {secure: true});
+							rate_html += '<div class="item_rate ' + ( (data_length == i) ? 'selected' : '' ) + ' " data-months="'+month+'" style="left: '+(i*132)+'px;">';
+								rate_html += '<span class="rate_period">'+ period_text +'</span>';
+								rate_html += '<span class="rate__icon"></span>';
+								rate_html += '<div class="rate__prices">';
+									rate_html += '<span class="rate__gift">'+rate.gift+'</span>';
+									rate_html += '<span class="rate__price">'+rate.price+' ₽</span>';
+								rate_html += '</div>';
+							rate_html += '</div>';
+							i++;
+						});
 					}
 
-					var html  = '<div class="widget_settings_block__item_field">';
-							html += '<div class="widget_settings_block__title_field">';
-								html += '<div class="pay_banner">';
-									html += '<span class="subscribe '+payment_class+'">' + payment_date + '</span>';
-									html += '<span class="payment-modal-show">'+ payment_btn_name +'</span>';
-								html += (payment_model === 'free') ? '</div>' : '';
-							html += '</div>';
-						html += '</div>';
-					$('#widget_settings__fields_wrapper .widget_settings_block__controls_top').before(html);
-					$('.widget-settings .widget-settings__wrap-desc-space').append(modal);
+					rate_html += '<div class="rate_selector" style="left: 396px;"></div>';
+					rate_html += '</div>';
 
+
+					var payment_class = '';
+					var payment_date = 'Загрузка';	
+					var payment_model = 'free';
+	
+					api.getPayment().then(function (data) {
+	
+						payment_class = data.class;
+						payment_date = data.date_end;
+						payment_model = data.payment_model;
+	
+						var btn_pay  = '<div class="widget_settings_block__item_field">';
+								btn_pay += '<div class="widget_settings_block__title_field">';
+									btn_pay += '<div class="btn_pay">';
+										btn_pay += '<span class="subscribe '+payment_class+'">' + payment_date + '</span>';
+										btn_pay += '<span class="button-input_blue">Оформить заказ</span>';
+									btn_pay += (payment_model === 'free') ? '</div>' : '';
+								btn_pay += '</div>';
+							btn_pay += '</div>';
+
+						var modal = '<div class="payment-modal">';
+							modal += '<div class="payment-form">';
+								
+								modal += '<p>Оставьте контактный номер телефона, мы свяжемся с Вами и расскажем как можно оплатить подписку на виджет!</p>'
+		
+								modal += '<div class="payment-form-block">';
+								modal += self.render(
+									{ ref: '/tmpl/controls/input.twig' },
+									{   
+										class_name: widgetTca + '_phone',
+										name: 'phone',
+										placeholder: '+79991234567',
+									}
+								);
+								modal += self.render(
+									{ ref: '/tmpl/controls/button.twig' },
+									{
+										class_name: widgetTca + '_button-input_green',
+										text: 'Отправить',
+										type: 'button'
+									});
+		
+								modal += '</div>';
+		
+								modal += '</div>';
+								modal += '<div class="'+widgetTca+'_overlay"></div>';
+							modal += '</div>';
 					
-					$('.payment-modal-show').on('click', function(){
-						$('.payment-modal').addClass('show');
-						$('.bizandsoft_phone').focus();
-					});
+						var pay_banner  = '<div class="widget_settings_block__item_field">';
+								pay_banner += '<div class="widget_settings_block__title_field">';
+									pay_banner += '<div class="pay_banner">';
+										pay_banner += '<span class="subscribe">Остались вопросы или пожелания?</span>';
+										pay_banner += '<span class="payment-modal-show">Служба поддержки</span>';
+									pay_banner += '</div>';
+								pay_banner += '</div>';
+							pay_banner += '</div>';
+							
+						$('.widget-settings .widget-settings__wrap-desc-space').append(modal);
+						$('#widget_settings__fields_wrapper .widget_settings_block__controls_top').before( pay_banner + rate_html + btn_pay );
 
-					$('.'+widgetTca+'_overlay').on('click', function(){
-						$('.payment-modal').removeClass('show');
-					});
-
-					$('.payment-modal button').on('click', function(){
-						var phone = $(this).parents('.payment-form-block').find('input[name=phone]');
-						if(phone.val().length > 6){
-							api.paymentForm(phone.val()).then(function(response){
+						// переход к оплате
+						$(document).on('click', '.btn_pay .button-input_blue', function(e){
+							e.stopImmediatePropagation();
+							var rate = $('.rates_wrapper .item_rate.selected').data('months');
+							api.payment(rate).then(function(response){
 								if(response.status){
-									$('.payment-form-block').remove();
-									$('.payment-form p').html(response.message);
+									window.open(response.url, '_blank');
 								}
-								phone.val('');
 							});
-						}else{
-							phone.effect( "shake", { 
-								direction: 'down', 
-								times: 3, 
-								distance: 3
-							   }, 500
-							);
-						}
+						});
+						//
+	
+						// переключение тарифов
+						$('.rates_wrapper .item_rate').on('click', function(){
+							$('.item_rate').removeClass('selected');
+							var item = $(this);
+							var months = item.data('months')
+							var left_px = 0;
+							$('.rates_wrapper .item_rate').each(function(i, v){
+								left_px = (i * 132) + 'px';
+								if($(this).data('months') === months){
+									$('.rate_selector').css('left', left_px );
+								}
+							});
+					
+							item.addClass('selected');
+						});
+
+						// отображаем модальное окно 
+						$('.payment-modal-show').on('click', function(){
+							$('.payment-modal').addClass('show');
+							$('.'+widgetTca+'_phone').focus();
+						});
+
+						// скрываем модальное окно
+						$('.'+widgetTca+'_overlay').on('click', function(){
+							$('.payment-modal').removeClass('show');
+						});
+
+						// отправляем данные из формы с номером тел
+						$('.payment-modal button').on('click', function(){
+							var phone = $(this).parents('.payment-form-block').find('input[name=phone]');
+							if(phone.val().length > 6 && phone.val().length < 13){
+								api.paymentForm(phone.val()).then(function(response){
+									if(response.status){
+										$('.payment-form-block').remove();
+										$('.payment-form p').html(response.message);
+									}
+									phone.val('');
+								});
+							}else{
+								phone.css('border-color', 'red');
+							}
+						});	
 					});
+					
+					$(document).on('click keyup', '.'+widgetTca+'_phone', function(){
+						$(this).attr('style', 'border-color:#dbdedfd');
+					});				
 				});
+				
 				
 				return true;
 			},
@@ -567,6 +682,7 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 				$('.' + widgetTca + '_mgc-modal').hide();
 				var lang = self.i18n('userLang');
 				self.w_code = self.params.widget_code;
+				
 				if (typeof(AMOCRM.data.current_card) != 'undefined') {
 					if (AMOCRM.data.current_card.id == 0) {
 						return false;
