@@ -113,23 +113,23 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 
 .modal-action.bizandsoft_leads_mgc-modal .danger,
 #widget_settings__fields_wrapper .danger  {
-    color: #dc3545;
+	color: #dc3545;
 }
 .modal-action.bizandsoft_leads_mgc-modal .warning,
 #widget_settings__fields_wrapper .warning  {
-    color: #ffc107;
+	color: #ffc107;
 }
 .modal-action.bizandsoft_leads_mgc-modal .success,
 #widget_settings__fields_wrapper .success  {
-    color: #198754;
+	color: #198754;
 }
 .modal-action.bizandsoft_leads_mgc-modal .subscribe {
-    font-size: 16px;
-    margin-left:15px;
+	font-size: 16px;
+	margin-left:15px;
 }
 #widget_settings__fields_wrapper .subscribe {
-    font-size: 16px;
-    margin-right: 15px;
+	font-size: 16px;
+	margin-right: 15px;
 }
 
 
@@ -245,7 +245,7 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 }
 
 	
-.rates_wrapper {
+.bizandsoft_leads_rates_wrapper {
 	font-size: 18px;
 	height: 161px;
 	position: relative;
@@ -253,7 +253,7 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	font-family: 'PT Sans',Arial,sans-serif;
 }
 
-.rates_wrapper:after {
+.bizandsoft_leads_rates_wrapper:after {
 	position: absolute;
 	content: '';
 	width: 100%;
@@ -407,6 +407,7 @@ span.rate_period {
 .btn_pay .button-input_blue {
 	padding: 12px;
 	font-size: 16px;
+	text-decoration: none;
 }
 
 .btn_pay {
@@ -453,4 +454,48 @@ span.rate_period {
 
 .payment-form .callback.show {
 	display: flex;
+}
+
+
+
+.bizandsoft_leads_rate_name .bizandsoft_leads_select-input {
+	margin: 0;
+	float: right;
+	width: 70%;
+}
+
+
+.bizandsoft_leads_rate_name {
+	margin: 20px 0 20px 0;
+	width: 504px;
+}
+
+.bizandsoft_leads_rate_name label {
+	margin-right: 15px;
+	margin-top: 15px;
+	margin-bottom: 0;
+	width: 20%;
+	font-weight: 400;
+}
+
+
+
+.bizandsoft_leads_rate_name .bizandsoft_leads_select-input {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	box-sizing: border-box;
+	display: inline-block;
+	height: 36px;
+	text-align: left;
+	outline: 0;
+	border: 1px solid #d4d5d8;
+	border-bottom-width: 2px;
+	border-radius: 3px;
+	background: -webkit-gradient(linear,left top,left bottom,from(#fcfcfc),to(#f8f8f9));
+	background: linear-gradient(to bottom,#fcfcfc 0%,#f8f8f9 100%);
+	padding: 1px 0 0 9px;
+	color: inherit;
+	margin-bottom: -20px;
+	font-size: 15px;
 }
