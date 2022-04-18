@@ -123,11 +123,11 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 #widget_settings__fields_wrapper .success  {
 	color: #198754;
 }
-.modal-action.bizandsoft_leads_mgc-modal .subscribe {
+.modal-action.bizandsoft_leads_mgc-modal .bizandsoft_leads_subscribe {
 	font-size: 16px;
 	margin-left:15px;
 }
-#widget_settings__fields_wrapper .subscribe {
+#widget_settings__fields_wrapper .bizandsoft_leads_subscribe {
 	font-size: 16px;
 	margin-right: 15px;
 }
@@ -168,8 +168,8 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	z-index: -1;
 }
 
-.amo_bizandsoft_leads .payment-form,
-.modal-body__inner .payment-form{
+.amo_bizandsoft_leads .bizandsoft_leads_payment-form,
+.modal-body__inner .bizandsoft_leads_payment-form{
 	box-shadow: 0 0 3px darkgrey;
 	z-index: 2;
 	width: 80%;
@@ -178,8 +178,8 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	position: relative;
 }
 
-.amo_bizandsoft_leads .payment-form-block,
-.modal-body__inner .payment-form-block{
+.amo_bizandsoft_leads .bizandsoft_leads_payment-form-block,
+.modal-body__inner .bizandsoft_leads_payment-form-block{
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
@@ -188,13 +188,13 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	align-content: stretch;
 }
 
-.amo_bizandsoft_leads .payment-form-block input,
-.modal-body__inner .payment-form-block input{
+.amo_bizandsoft_leads .bizandsoft_leads_payment-form-block input,
+.modal-body__inner .bizandsoft_leads_payment-form-block input{
 	margin-right: 15px;
 }
 
-.amo_bizandsoft_leads .payment-form p,
-.modal-body__inner .payment-form p{
+.amo_bizandsoft_leads .bizandsoft_leads_payment-form p,
+.modal-body__inner .bizandsoft_leads_payment-form p{
 	text-align: center;
 	margin-bottom: 15px;
 }
@@ -205,8 +205,8 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	z-index: 10;
 }
 
-.payment-modal-show,
-.modal-body__inner .payment-modal-show{
+.bizandsoft_leads_payment-modal-show,
+.modal-body__inner .bizandsoft_leads_payment-modal-show{
 	background: rgb(65 177 0 / 5%);
 	border: 1px solid #28ad6f;
 	color: #24bc8c;
@@ -223,7 +223,7 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	width: 194px !important;
 }
 
-.pay_banner {
+.bizandsoft_leads_pay_banner {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
@@ -236,11 +236,11 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	background: #f0f0f0;
 }
 
-.pay_banner .payment-modal-show {
+.bizandsoft_leads_pay_banner .bizandsoft_leads_payment-modal-show {
 	padding: 3px 25px;
 }
 
-.head_2 span:not(.payment-modal-show) {
+.head_2 span:not(.bizandsoft_leads_payment-modal-show) {
 	margin-right: 15px;
 }
 
@@ -265,7 +265,7 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	z-index: 0;
 }
 
-.item_rate {
+.bizandsoft_leads_item_rate {
 	width: 108px;
 	height: 141px;
 	cursor: pointer;
@@ -277,7 +277,7 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	margin-top: 7px;
 }
 
-.item_rate:before {
+.bizandsoft_leads_item_rate:before {
 	position: absolute;
 	content: '';
 	width: 22px;
@@ -290,14 +290,14 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	margin-left: -11px;
 	z-index: -2;
 }
-.rate__prices {
+.bizandsoft_leads_rate__prices {
 	position: absolute;
 	bottom: -6px;
 	left: 0;
 	right: 0;
 }
 
-.rate__icon {
+.bizandsoft_leads_rate__icon {
 	display: none;
 	position: absolute;
 	width: 32px;
@@ -313,7 +313,7 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	margin-top: -28px;
 }
 
-.item_rate.selected:after {
+.bizandsoft_leads_item_rate.selected:after {
 	z-index: -2;
 	background: #fff;
 	content: '';
@@ -327,11 +327,11 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	height: 34px;
 }
 
-.item_rate.selected .rate__icon {
+.bizandsoft_leads_item_rate.selected .bizandsoft_leads_rate__icon {
 	display: block;
 }
 
-.rate__gift {
+.bizandsoft_leads_rate__gift {
 	display: block;
 	color: #749e42;
 	font-size: 18px;
@@ -339,7 +339,7 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	line-height: 20px;
 }
 
-.rate_selector {
+.bizandsoft_leads_rate_selector {
 	outline: 2px solid #749e42;
 	z-index: 1;
 	width: 103px;
@@ -353,64 +353,25 @@ div.bizandsoft_leads-action__top-controls button.bizandsoft_leads_bye:hover {
 	transition: left .3s ease-out 0s;
 }
 
-span.rate_period {
+span.bizandsoft_leads_rate_period {
 	position: relative;
 	top: 15px;
 }
 
-.rate__price {
+.bizandsoft_leads_rate__price {
 	font-size: 15px;
 	position: relative;
 	top: 7px;
 	display: block;
 }
-.bs_tt {
-	position: absolute;
-	right: 0;
-	top: 100%;
-	display: block;
-	color: white;
-	padding-top: 7px;
-	width: 200px;
-}
 
-.bs_tt_content {
-	padding: 8px;
-	color: #fff;
-	text-align: center;
-	background-color: #000;
-	border-radius: 3px;
-	font-size: 14px;
-	display: block;
-}
-
-.bs_tt_arrow:before {
-	position: absolute;
-	content: "";
-	border-color: transparent;
-	border-style: solid;
-	bottom: 0;
-	border-width: 0 0.4rem 0.4rem;
-	border-bottom-color: #000;
-	right: 35px;
-}
-
-.bs_tt_arrow {
-	position: relative;
-}
-
-.btn_payment {
-	border: 1px solid black;
-	padding: 15px;
-}
-
-.btn_pay .button-input_blue {
+.bizandsoft_leads_btn_pay .button-input_blue {
 	padding: 12px;
 	font-size: 16px;
 	text-decoration: none;
 }
 
-.btn_pay {
+.bizandsoft_leads_btn_pay {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: nowrap;
@@ -421,16 +382,16 @@ span.rate_period {
 	cursor: pointer;
 }
 
-.widget_settings_block__title_field .pay_banner,
-.payment-form .pay_banner {
+.widget_settings_block__title_field .bizandsoft_leads_pay_banner,
+.bizandsoft_leads_payment-form .bizandsoft_leads_pay_banner {
 	width: 473px !important;
 }
 
-.amo_bizandsoft_leads .payment-modal-show {
+.amo_bizandsoft_leads .bizandsoft_leads_payment-modal-show {
 	padding: 3px 25px !important;
 }
 
-.payment-form .callback {
+.bizandsoft_leads_payment-form .callback {
 	width: 100%;
 	height: 100%;
 	position: absolute;
@@ -445,14 +406,14 @@ span.rate_period {
 	z-index: 20;
 }
 
-.payment-form .callback_body {
+.bizandsoft_leads_payment-form .callback_body {
 	margin: 0px 40px;
 	padding: 30px;
 	background: white;
 	box-shadow: 0 0 3px darkgrey;
 }
 
-.payment-form .callback.show {
+.bizandsoft_leads_payment-form .callback.show {
 	display: flex;
 }
 

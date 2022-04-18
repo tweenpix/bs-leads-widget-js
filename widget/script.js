@@ -167,11 +167,11 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 				$('#'+w_code+'_custom').val(2); 
 
 				var modal = '<div class="payment-modal">';
-							modal += '<div class="payment-form">';
+							modal += '<div class="'+widgetTca+'_payment-form">';
 								
 								modal += '<p>Оставьте контактный номер телефона, мы свяжемся с Вами и расскажем как можно оплатить подписку на виджет!</p>'
 		
-								modal += '<div class="payment-form-block">';
+								modal += '<div class="'+widgetTca+'_payment-form-block">';
 								modal += self.render(
 									{ ref: '/tmpl/controls/input.twig' },
 									{   
@@ -199,9 +199,9 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 
 				var pay_banner  = '<div class="widget_settings_block__item_field">';
 								pay_banner += '<div class="widget_settings_block__title_field">';
-									pay_banner += '<div class="pay_banner">';
+									pay_banner += '<div class="'+widgetTca+'_pay_banner">';
 										pay_banner += '<span class="subscribe">Остались вопросы или пожелания?</span>';
-										pay_banner += '<span class="payment-modal-show">Служба поддержки</span>';
+										pay_banner += '<span class="'+widgetTca+'_payment-modal-show">Служба поддержки</span>';
 									pay_banner += '</div>';
 								pay_banner += '</div>';
 					pay_banner += '</div>';
@@ -264,19 +264,19 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 								
 								url = 'https://payamo.bizandsoft.ru/payment.php?subdomain=' + AMOCRM.constant('account').subdomain + '&widget=' + widgetPath + '&rate=' + month + '&rate_name='+ rate_name;
 
-								rate_html += '<div class="item_rate ' + ( (data_length == i) ? 'selected' : '' ) + ' " data-months="'+month+'" style="left: '+(i*132)+'px;">';
-									rate_html += '<span class="rate_period">'+ period_text +'</span>';
-									rate_html += '<span class="rate__icon"></span>';
-									rate_html += '<div class="rate__prices">';
-										rate_html += '<span class="rate__gift">'+rate.gift+'</span>';
-										rate_html += '<span class="rate__price">'+rate.price+' ₽</span>';
+								rate_html += '<div class="'+widgetTca+'_item_rate ' + ( (data_length == i) ? 'selected' : '' ) + ' " data-months="'+month+'" style="left: '+(i*132)+'px;">';
+									rate_html += '<span class="'+widgetTca+'_rate_period">'+ period_text +'</span>';
+									rate_html += '<span class="'+widgetTca+'_rate__icon"></span>';
+									rate_html += '<div class="'+widgetTca+'_rate__prices">';
+										rate_html += '<span class="'+widgetTca+'_rate__gift">'+rate.gift+'</span>';
+										rate_html += '<span class="'+widgetTca+'_rate__price">'+rate.price+' ₽</span>';
 									rate_html += '</div>';
 								rate_html += '</div>';
 								i++;
 							});
 						}
 
-						rate_html += '<div class="rate_selector" style="left: 396px;"></div>';
+						rate_html += '<div class="'+widgetTca+'_rate_selector" style="left: 396px;"></div>';
 						
 
 
@@ -293,8 +293,8 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 
 							btn_pay = '<div class="widget_settings_block__title_field">';
 								
-								btn_pay += '<div class="btn_pay">';
-									btn_pay += '<span class="subscribe '+payment_class+'">' + payment_date + '</span>';
+								btn_pay += '<div class="'+widgetTca+'_btn_pay">';
+									btn_pay += '<span class="'+widgetTca+'_subscribe '+payment_class+'">' + payment_date + '</span>';
 									btn_pay += '<a href="' + url + '" target="blank" class="button-input_blue">Оформить подписку</a>';
 								btn_pay += (payment_model === 'free') ? '</div>' : '';
 
@@ -307,25 +307,25 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 							
 		
 							// переключение месяцев
-							$('.'+widgetTca+'_rates_wrapper .item_rate').on('click', function(){
-								$('.item_rate').removeClass('selected');
+							$('.'+widgetTca+'_rates_wrapper .'+widgetTca+'_item_rate').on('click', function(){
+								$('.'+widgetTca+'_item_rate').removeClass('selected');
 								var item = $(this);
 								var months = item.data('months')
 								var left_px = 0;
-								$('.'+widgetTca+'_rates_wrapper .item_rate').each(function(i, v){
+								$('.'+widgetTca+'_rates_wrapper .'+widgetTca+'_item_rate').each(function(i, v){
 									left_px = (i * 132) + 'px';
 									if($(this).data('months') === months){
-										$('.rate_selector').css('left', left_px );
+										$('.'+widgetTca+'_rate_selector').css('left', left_px );
 									}
 								});
 								url = 'https://payamo.bizandsoft.ru/payment.php?subdomain=' + AMOCRM.constant('account').subdomain + '&widget=' + widgetPath + '&rate=' + months + '&rate_name='+ rate_name;
-								$('.btn_pay .button-input_blue').attr('href', url);
+								$('.'+widgetTca+'_btn_pay .button-input_blue').attr('href', url);
 								item.addClass('selected');
 							});
 	
 
 							// отображаем модальное окно 
-							$('.payment-modal-show').on('click', function(){
+							$('.'+widgetTca+'_payment-modal-show').on('click', function(){
 								$('.payment-modal').addClass('show');
 								$('.'+widgetTca+'_phone').focus();
 							});
@@ -337,12 +337,12 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 
 							// отправляем данные из формы с номером тел
 							$('.payment-modal button').on('click', function(){
-								var phone = $(this).parents('.payment-form-block').find('input[name=phone]');
+								var phone = $(this).parents('.'+widgetTca+'_payment-form-block').find('input[name=phone]');
 								if(phone.val().length > 6 && phone.val().length < 13){
 									api.paymentForm(phone.val()).then(function(response){
 										if(response.status){
-											$('.payment-form-block').remove();
-											$('.payment-form p').html(response.message);
+											$('.'+widgetTca+'_payment-form-block').remove();
+											$('.'+widgetTca+'_payment-form p').html(response.message);
 										}
 										phone.val('');
 									});
