@@ -158,8 +158,7 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 				var installState = self.get_install_status();
 
 				if (installState == 'install' || installState == 'not_configured'){
-					modalAct.find('.widget_settings_block__controls').prepend('<div class="'+ widgetTca +'-section_warning"> Виджет не активирован! </div>');
-					save.find('.button-input-inner__text').text('Активировать виджет');
+					modalAct.find('.widget_settings_block__controls').prepend('<div class="'+ widgetTca +'-section_warning"> Виджет не активирован! Для того, чтобы активировать виджет, нажмите кнопку "Сохранить". </div>');
 				}
 				
 				modalAct.addClass('amo_'+ widgetTca);
