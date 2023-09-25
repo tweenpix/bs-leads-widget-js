@@ -3,7 +3,7 @@
 		"name": "widget.name",
 		"description": "widget.description",
 		"short_description": "widget.short_description",
-		"version": "0.197",
+		"version": "0.23",
 		"interface_version": 2,
 		"init_once": false,
 		"locale": [
@@ -13,6 +13,15 @@
 		"support": {
 			"link": "https://bizandsoft.ru/",
 			"email": "amocrm@bizandsoft.ru"
+		}
+	},
+	"left_menu": {
+		"stats": {
+		  "submenu": {
+			"stats_bs_leads": {
+			  "title": "widget.stats_name"
+			}
+		  }
 		}
 	},
 	"tour": {
@@ -29,29 +38,30 @@
 		"lcard-1",
 		"settings",
 		"digital_pipeline",
-		"advanced_settings"
+		"advanced_settings",
+		"everywhere"
 	],
 	"dp": {
-	"action_multiple": false,
-	"webhook_url": "https://leads.bizandsoft.ru/bs-leads/webhook",
-	"settings": {
-			"user_ids": {
-					"name": "settings.user_ids",
-					"type": "text",
-					"required": false
-			},
-			"creator_ids": {
-					"name": "settings.creator_ids",
-					"type": "text",
-					"required": false
-			},
-			"distribute_previously_distributed": {
-					"name": "settings.distribute_previously_distributed",
-					"type": "text",
-					"required": false
-			}
-	}
-},
+		"action_multiple": false,
+		"webhook_url": "https://leads.bizandsoft.ru/bs-leads/webhook",
+		"settings": {
+				"user_ids": {
+						"name": "settings.user_ids",
+						"type": "text",
+						"required": false
+				},
+				"creator_ids": {
+						"name": "settings.creator_ids",
+						"type": "text",
+						"required": false
+				},
+				"distribute_previously_distributed": {
+						"name": "settings.distribute_previously_distributed",
+						"type": "text",
+						"required": false
+				}
+		}
+	},
 	"settings": {
 		"consent": {
 			"name": "settings.consent",

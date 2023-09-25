@@ -1,6 +1,12 @@
 define(['jquery', 'lib/components/base/modal'], function($, Modal){
 	var CustomWidget = function () {
-		var self = this, system = self.system(), widgetTca = 'bizandsoft_leads', widgetPath = 'bs-leads', currentUser = $('.n-avatar').first().attr('id'), serverName = 'leads.bizandsoft.ru';
+		var self = this,
+		system = self.system(), 
+		widgetTca = 'amo_bizandsoft_leads',
+		widgetPath = 'bs-leads', 
+		widget_name = 'bs-leads',
+		currentUser = $('.n-avatar').first().attr('id'), 
+		serverName = 'leads.bizandsoft.ru';
 
 		self.widgetTca = widgetTca;
 		
@@ -86,6 +92,41 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 						});
 					});
 				},
+				online: function (users) { // отправляет кто онлайн
+					return new Promise(function (resolve, reject) {
+						$.ajax({
+                            url: 'https://' + serverName + '/' + widgetPath + '/partials/online.php', // не меняем
+                            method: 'POST',
+                            dataType: 'json',
+                            data: {
+								'subdomain': AMOCRM.constant('account').subdomain,
+								'users': users,
+							},
+							success: function (response) {
+								resolve(response);
+							},
+							error: function (err) {
+								reject(err);
+							}
+						});
+					});
+				},
+				newOrder: function (data) {
+                    return new Promise(function (resolve , reject) {
+                        self.$authorizedAjax({
+                            url: 'https://payamo.bizandsoft.ru/new_order.php',
+                            method: 'POST',
+                            dataType: 'json',
+							data: data,
+                            success: function(response) {
+                              resolve(response);
+                            },
+                            error: function(err) {
+                              reject(err);
+                            }
+                        });
+                    } )
+                }
 			}
 		})($);
 		
@@ -151,216 +192,340 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 
 
 		this.callbacks = {
-			settings: function(){
-				var w_code = self.params.widget_code;	
-				var modalAct = $('.widget-settings__modal.' + w_code);
-				var save  = modalAct.find('button.js-widget-save');
-				var installState = self.get_install_status();
+			settings: function($modalBody){
 
-				if (installState == 'install' || installState == 'not_configured'){
-					modalAct.find('.widget_settings_block__controls').prepend('<div class="'+ widgetTca +'-section_warning"> Виджет не активирован! Для того, чтобы активировать виджет, нажмите кнопку "Сохранить". </div>');
+				$('#'+widgetTca+'_custom').val(2);
+				
+				const installState = self.get_install_status();
+				if (installState == 'install' || installState == 'not_configured') {
+					$modalBody.find('.widget_settings_block__descr').before('<div class="' + 
+					widgetTca + '-section_warning">' + self.i18n('interface').wdg_not_active + '</div>');
 				}
-				
-				modalAct.addClass('amo_'+ widgetTca);
-				
-				$('#'+w_code+'_custom').val(2); 
 
 				var modal = '<div class="payment-modal">';
-							modal += '<div class="'+widgetTca+'_payment-form">';
-								
-								modal += '<p>Оставьте контактный номер телефона, мы свяжемся с Вами и расскажем как можно оплатить подписку на виджет!</p>'
-		
-								modal += '<div class="'+widgetTca+'_payment-form-block">';
-								modal += self.render(
-									{ ref: '/tmpl/controls/input.twig' },
-									{   
-										class_name: widgetTca + '_phone',
-										name: 'phone',
-										placeholder: '+79991234567',
-									}
-								);
-								modal += self.render(
-									{ ref: '/tmpl/controls/button.twig' },
-									{
-										class_name: widgetTca + '_button-input_green',
-										text: 'Отправить',
-										type: 'button'
-									});
-		
-								modal += '</div>';
-		
-								modal += '</div>';
-								modal += '<div class="'+widgetTca+'_overlay"></div>';
-							modal += '</div>';
+					modal += '<div class="payment-form">';
+						modal += '<p>Оставьте контактный номер телефона, мы свяжемся с Вами и расскажем как можно оплатить подписку на виджет!</p>'
+						modal += '<div class="payment-form-block">';
+						modal += self.render(
+							{ ref: '/tmpl/controls/input.twig' },
+							{   
+								class_name: widgetTca + '_phone',
+								name: 'phone',
+								placeholder: '+79991234567',
+							}
+						);
+						modal += self.render(
+							{ ref: '/tmpl/controls/button.twig' },
+							{
+								class_name: widgetTca + '_button-input_green',
+								text: 'Отправить',
+								type: 'button'
+							});
+						modal += '</div>';
+						modal += '</div>';
+						modal += '<div class="'+widgetTca+'_overlay"></div>';
+					modal += '</div>';
+				
+				var pay_banner  = '<div class="widget_settings_block__item_field">';
+					pay_banner += '<div class="widget_settings_block__title_field">';
+						pay_banner += '<div class="pay_banner">';
+							pay_banner += '<span class="subscribe">Остались вопросы или пожелания?</span>';
+							pay_banner += '<span class="payment-modal-show">Служба поддержки</span>';
+						pay_banner += '</div>';
+					pay_banner += '</div>';
+				pay_banner += '</div>';
 					
-													
+				$('#widget_settings__fields_wrapper .widget_settings_block__controls_top').before( pay_banner );
 				$('.widget-settings .widget-settings__wrap-desc-space').append(modal);
 
-				var pay_banner  = '<div class="widget_settings_block__item_field">';
-								pay_banner += '<div class="widget_settings_block__title_field">';
-									pay_banner += '<div class="'+widgetTca+'_pay_banner">';
-										pay_banner += '<span class="subscribe">Остались вопросы или пожелания?</span>';
-										pay_banner += '<span class="'+widgetTca+'_payment-modal-show">Служба поддержки</span>';
-									pay_banner += '</div>';
-								pay_banner += '</div>';
-					pay_banner += '</div>';
-
-
-
-				var rateSelectHtml =	'<div class="'+widgetTca+'_rate_name">';
-				rateSelectHtml +=	'<label for="'+widgetTca+'_rate_name">Выберите тариф:</label>';
-				rateSelectHtml +=	'<select name="'+widgetTca+'_rate_name" class="'+widgetTca+'_select-input" id="'+widgetTca+'_rate_name">';
-				rateSelectHtml +=	'<option value="default">Стандартный</option>';
-				rateSelectHtml +=	'<option value="full" selected>Расширенный</option>';
-				rateSelectHtml +=	'</select>';
-				rateSelectHtml +=	'</div>';
-
-
-				var ratesWrapperHtml = '<div class="'+widgetTca+'_rates_wrapper" style="width: 396px;"></div>';
-				var btnPayHtml  = '<div class="widget_settings_block__item_field '+widgetTca+'_btn_pay_item_field"></div>';
-
-				$('#widget_settings__fields_wrapper .widget_settings_block__controls_top').before(pay_banner + rateSelectHtml +ratesWrapperHtml + btnPayHtml);
-
-				// загрузим тариф который в выбран в html
-				var rate_name = $('.'+widgetTca+'_rate_name select').val();
-				select_rate(rate_name);
-			
-				// перезагружаем тариф при изменении селекта
-				$('.'+widgetTca+'_rate_name select').on('change', function(){
-					var rate_name = $(this).val();
-					select_rate(rate_name);
+				// отображаем модальное окно 
+				$('.payment-modal-show').on('click', function(){
+					$('.payment-modal').addClass('show');
+					$('.'+widgetTca+'_phone').focus();
 				});
-			
-				function select_rate(rate_name){
 
-					api.getRates(widgetPath, rate_name).then(function (data) {
+				// скрываем модальное окно
+				$('.'+widgetTca+'_overlay').on('click', function(){
+					$('.payment-modal').removeClass('show');
+				});
 
+				// отправляем данные из формы с номером тел
+				$('.payment-modal button').on('click', function(){
+					var phone = $(this).parents('.payment-form-block').find('input[name=phone]');
+					if(phone.val().length > 6){
+						api.paymentForm(phone.val()).then(function(response){
+							if(response.status){
+								$('.payment-form-block').remove();
+								$('.payment-form p').html(response.message);
+							}
+							phone.val('');
+						});
+					}else{
+						phone.effect( "shake", { 
+							direction: 'down', 
+							times: 3, 
+							distance: 3
+							}, 500
+						);
+					}
+				});
+	
+				api.getRates(widget_name, 'full').then(function (data) {
+					var rate_html = '<div class="rate_name">';
 
-						var rate_html = '';
+						rate_html += '<label for="rate_name">Тариф</label>';
+
+						rate_html += self.render(
+							{ ref: '/tmpl/controls/select.twig' },
+							{ items: [
+								{
+									id: 'default',
+									option: 'Стандартный',
+								},{
+									id: 'full',
+									option: 'Расширенный',
+								}
+							],      
+							name: 'rate_name',
+							selected: 'full'
+							}
+						);
+
+					rate_html += '</div>';
+
+					rate_html += '<div class="rates_container">';
+						rate_html += '<div class="rates_wrapper" style="width: 396px;">';
 						var url = '';
 						var period_text = '';
 						var i = 0;
 						var data_length = (Object.keys(data).length);
 
-
-
 						if(data_length){
 							data_length--;
 							$.each(data, function(month, rate){
-								if(month === 1){
-									period_text = month + ' месяц';
-								}else if(month > 1 && month < 5){
-									period_text = month + ' месяца';
-								}else if(month > 5 && month < 12){
-									period_text = month + ' месяцев';
+								if(month == 3){
+									period_text = month + ' месяца'
+								}else if(month == 6){
+									period_text = month + ' месяцев'
 								}else if(month == 12){
 									period_text = '1 год';
 								}else if(month == 24){
 									period_text = '2 года';
 								}
+								url = 'https://payamo.bizandsoft.ru/payment.php?subdomain=' + AMOCRM.constant('account').subdomain + '&widget=' + widget_name + '&rate=' + month + '&rate_name=full';
 
-
-								
-								url = 'https://payamo.bizandsoft.ru/payment.php?subdomain=' + AMOCRM.constant('account').subdomain + '&widget=' + widgetPath + '&rate=' + month + '&rate_name='+ rate_name;
-
-								rate_html += '<div class="'+widgetTca+'_item_rate ' + ( (data_length == i) ? 'selected' : '' ) + ' " data-months="'+month+'" style="left: '+(i*132)+'px;">';
-									rate_html += '<span class="'+widgetTca+'_rate_period">'+ period_text +'</span>';
-									rate_html += '<span class="'+widgetTca+'_rate__icon"></span>';
-									rate_html += '<div class="'+widgetTca+'_rate__prices">';
-										rate_html += '<span class="'+widgetTca+'_rate__gift">'+rate.gift+'</span>';
-										rate_html += '<span class="'+widgetTca+'_rate__price">'+rate.price+' ₽</span>';
+								rate_html += '<div class="item_rate ' + ( (data_length == i) ? 'selected' : '' ) + ' " data-months="'+month+'" style="left: '+(i*132)+'px;">';
+									rate_html += '<span class="rate_period">'+ period_text +'</span>';
+									rate_html += '<span class="rate__icon"></span>';
+									rate_html += '<div class="rate__prices">';
+										rate_html += '<span class="rate__gift">'+rate.gift+'</span>';
+										rate_html += '<span class="rate__price">'+rate.price+' ₽</span>';
 									rate_html += '</div>';
 								rate_html += '</div>';
 								i++;
 							});
 						}
+						rate_html += '<div class="rate_selector" style="left: '+(data_length*132)+'px;"></div>';
+						rate_html += '</div>';
+					rate_html += '</div>';
 
-						rate_html += '<div class="'+widgetTca+'_rate_selector" style="left: 396px;"></div>';
-						
-
-
-						var payment_class = '';
-						var payment_date = 'Загрузка';	
-						var payment_model = 'free';
-		
-						api.getPayment().then(function (data) {
-		
-							payment_class = data.class;
-							payment_date = data.date_end;
-							payment_model = data.payment_model;
-		
-
-							btn_pay = '<div class="widget_settings_block__title_field">';
-								
-								btn_pay += '<div class="'+widgetTca+'_btn_pay">';
-									btn_pay += '<span class="'+widgetTca+'_subscribe '+payment_class+'">' + payment_date + '</span>';
-									btn_pay += '<a href="' + url + '" target="blank" class="button-input_blue">Оформить подписку</a>';
-								btn_pay += (payment_model === 'free') ? '</div>' : '';
-
-							btn_pay += '</div>';
-					
-
-							$('.'+widgetTca+'_rates_wrapper').html(rate_html);
-							$('.'+widgetTca+'_btn_pay_item_field').html(btn_pay);
-
-							
-		
-							// переключение месяцев
-							$('.'+widgetTca+'_rates_wrapper .'+widgetTca+'_item_rate').on('click', function(){
-								$('.'+widgetTca+'_item_rate').removeClass('selected');
-								var item = $(this);
-								var months = item.data('months')
-								var left_px = 0;
-								$('.'+widgetTca+'_rates_wrapper .'+widgetTca+'_item_rate').each(function(i, v){
-									left_px = (i * 132) + 'px';
-									if($(this).data('months') === months){
-										$('.'+widgetTca+'_rate_selector').css('left', left_px );
-									}
-								});
-								url = 'https://payamo.bizandsoft.ru/payment.php?subdomain=' + AMOCRM.constant('account').subdomain + '&widget=' + widgetPath + '&rate=' + months + '&rate_name='+ rate_name;
-								$('.'+widgetTca+'_btn_pay .button-input_blue').attr('href', url);
-								item.addClass('selected');
-							});
+					var payment_class = '';
+					var payment_date = 'Загрузка';	
+					var payment_model = 'free';
 	
+					api.getPayment().then(function (data) {
+	
+						payment_class = data.class;
+						payment_date = data.date_end;
+						payment_model = data.payment_model;
+	
+						var btn_pay  = '<div class="widget_settings_block__item_field">';
+								btn_pay += '<div class="widget_settings_block__title_field">';
+									btn_pay += '<div class="btn_pay_'+widgetTca+'">';
+										btn_pay += '<span class="subscribe '+payment_class+'">' + payment_date + '</span>';
+										btn_pay += '<a href="' + url + '" target="blank" class="button-input_blue">Оформить заказ</a>';
+									btn_pay += (payment_model === 'free') ? '</div>' : '';
+								btn_pay += '</div>';
+							btn_pay += '</div>';
 
-							// отображаем модальное окно 
-							$('.'+widgetTca+'_payment-modal-show').on('click', function(){
-								$('.payment-modal').addClass('show');
-								$('.'+widgetTca+'_phone').focus();
-							});
-
-							// скрываем модальное окно
-							$('.'+widgetTca+'_overlay').on('click', function(){
-								$('.payment-modal').removeClass('show');
-							});
-
-							// отправляем данные из формы с номером тел
-							$('.payment-modal button').on('click', function(){
-								var phone = $(this).parents('.'+widgetTca+'_payment-form-block').find('input[name=phone]');
-								if(phone.val().length > 6 && phone.val().length < 13){
-									api.paymentForm(phone.val()).then(function(response){
-										if(response.status){
-											$('.'+widgetTca+'_payment-form-block').remove();
-											$('.'+widgetTca+'_payment-form p').html(response.message);
+							var currency  = '<div class="currency_container_'+widgetTca+'">';
+							currency += '<div class="title_'+widgetTca+'">Валюта для оплаты</div>';
+							currency += self.render( 
+								{ ref: '/tmpl/controls/select.twig' },
+								{
+									items: [
+										{
+											id: 'RUB',
+											option: 'Рубль',
+										},{
+											id: 'KZT',
+											option: 'Тенге',
+										},{
+											id: 'USD',
+											option: 'Доллар',
+										},{
+											id: 'EUR',
+											option: 'Евро',
 										}
-										phone.val('');
-									});
-								}else{
-									phone.css('border-color', 'red');
+									],      
+									id: 'currency_select_'+widgetTca,   
+									class_name: 'currency_select_'+widgetTca,
+									name: 'form[currency]',
 								}
-							});	
-						});
-						
-						$(document).on('click keyup', '.'+widgetTca+'_phone', function(){
-							$(this).attr('style', 'border-color:#dbdedfd');
-						});				
-					});
-				
-				}
-				
-				return true;
-			},
+							);
+						currency += '</div>';
 
+						var currency_phone_container = '<div class="currency_phone_container_'+widgetTca+' hidden_'+widgetTca+'">';
+							currency_phone_container += '<div class="title_'+widgetTca+'">Телефон для связи</div>';
+							currency_phone_container += self.render(
+								{ ref: '/tmpl/controls/input.twig' },
+								{   
+									name: 'phone',
+									value: '',
+									type: 'text',
+									placeholder: '+79990000000',
+									class_name: 'currency_phone_'+widgetTca,
+								}
+							);
+							currency_phone_container += '</div>';
+
+						// добавлям сгенерированный html
+						$('#widget_settings__fields_wrapper .widget_settings_block__controls_top').before( currency + currency_phone_container + rate_html + btn_pay );
+
+
+						// при смене валюты
+						$('#currency_select_'+widgetTca).on('change', function(){
+
+							if($(this).val() === 'RUB'){
+								$('.currency_phone_container_'+widgetTca).addClass('hidden_'+widgetTca);
+								$('.btn_pay_'+widgetTca+' a').removeClass('disabled_'+widgetTca).text('Оформить заказ').unbind('click');
+							}else{
+								$('.currency_phone_container_'+widgetTca).removeClass('hidden_'+widgetTca);
+								$('.btn_pay_'+widgetTca+' a').addClass('disabled_'+widgetTca).text('Оформить заявку');
+
+								$('.disabled_'+widgetTca).on('click', function(e){
+									e.preventDefault();
+									var phone_value = $('.currency_phone_'+widgetTca).val();
+									var order = {
+										widget: widget_name,
+										currency: $('#currency_select_'+widgetTca).val(),
+										months: $('.item_rate.selected').data('months'),
+										rate_name: $('.rate_name [name=rate_name]').val(),
+										phone: phone_value
+									};
+									if( phone_value.length >= 10 ){
+										$('.currency_phone_'+widgetTca).css('border-color', '#dbdedf')
+										api.newOrder(order).then(function (data) {
+											payment(data.message);
+										});
+									}else{
+										$('.currency_phone_'+widgetTca).css('border-color', 'red')
+									}
+									
+								});
+							}						
+						});
+
+						function payment(message){
+							$('.payment-modal_'+widgetTca).remove();
+							var modal_pay  = '<div class="payment-modal_'+widgetTca+'">';
+									modal_pay += '<div class="payment_form_'+widgetTca+'">';
+										modal_pay += '<p>'+message+'</p>'
+									modal_pay += '</div>';
+									modal_pay += '<div class="'+widgetTca+'_overlay"></div>';
+								modal_pay += '</div>';
+							$('.widget-settings .widget-settings__wrap-desc-space').append(modal_pay);
+							$('.payment-modal_'+widgetTca+' .'+widgetTca+'_overlay').on('click', function(){
+								$(this).parents('.payment-modal_'+widgetTca).remove();
+							});
+						}
+
+
+						$('.rate_name [name=rate_name]').on('change', function(){
+							var rate_name = $(this).val();
+							api.getRates(widget_name, rate_name ).then(function (data) {
+
+								var rate_html = '<div class="rates_wrapper" style="width: 396px;">';
+								var url = '';
+								var period_text = '';
+								var i = 0;
+								var data_length = (Object.keys(data).length);
+			
+								if(data_length){
+									data_length--;
+									$.each(data, function(month, rate){
+										if(month == 3){
+											period_text = month + ' месяца'
+										}else if(month == 6){
+											period_text = month + ' месяцев'
+										}else if(month == 12){
+											period_text = '1 год';
+										}else if(month == 24){
+											period_text = '2 года';
+										}
+
+										url = 'https://payamo.bizandsoft.ru/payment.php?subdomain=' + AMOCRM.constant('account').subdomain + '&widget=' + widget_name + '&rate=' + month + '&rate_name='+rate_name;
+										$('.btn_pay_'+widgetTca+' .button-input_blue').attr('href', url);
+
+										rate_html += '<div class="item_rate ' + ( (data_length == i) ? 'selected' : '' ) + ' " data-months="'+month+'" style="left: '+(i*132)+'px;">';
+											rate_html += '<span class="rate_period">'+ period_text +'</span>';
+											rate_html += '<span class="rate__icon"></span>';
+											rate_html += '<div class="rate__prices">';
+												rate_html += '<span class="rate__gift">'+rate.gift+'</span>';
+												rate_html += '<span class="rate__price">'+rate.price+' ₽</span>';
+											rate_html += '</div>';
+										rate_html += '</div>';
+										i++;
+									});
+								}
+								rate_html += '<div class="rate_selector" style="left: 396px;"></div>';
+								rate_html += '</div>';
+								$('.rates_wrapper').remove();
+								$('.rates_container').append(rate_html);
+
+								// переключение тарифов
+								$('.rates_wrapper .item_rate').on('click', function(){
+									$('.item_rate').removeClass('selected');
+									var rate_name = $('.rate_name [name=rate_name]').val();
+									var item = $(this);
+									var months = item.data('months')
+									var left_px = 0;
+									$('.rates_wrapper .item_rate').each(function(i, v){
+										left_px = (i * 132) + 'px';
+										if($(this).data('months') === months){
+											$('.rate_selector').css('left', left_px );
+										}
+									});
+									url = 'https://payamo.bizandsoft.ru/payment.php?subdomain=' + AMOCRM.constant('account').subdomain + '&widget=' + widget_name + '&rate=' + months + '&rate_name='+rate_name;
+									$('.btn_pay_'+widgetTca+' .button-input_blue').attr('href', url);
+									item.addClass('selected');
+								});
+
+							});
+						});
+
+						// переключение тарифов
+						$('.rates_wrapper .item_rate').on('click', function(){
+							$('.item_rate').removeClass('selected');
+							var rate_name = $('.rate_name [name=rate_name]').val();
+							var item = $(this);
+							var months = item.data('months')
+							var left_px = 0;
+							$('.rates_wrapper .item_rate').each(function(i, v){
+								left_px = (i * 132) + 'px';
+								if($(this).data('months') === months){
+									$('.rate_selector').css('left', left_px );
+								}
+							});
+							url = 'https://payamo.bizandsoft.ru/payment.php?subdomain=' + AMOCRM.constant('account').subdomain + '&widget=' + widget_name + '&rate=' + months + '&rate_name='+rate_name;
+							$('.btn_pay_'+widgetTca+' .button-input_blue').attr('href', url);
+							item.addClass('selected');
+						});
+
+					});
+				});
+
+			},
 			dpSettings: function () {
 				var dp = $(".digital-pipeline__short-task_widget-style_" + self.w_code).parent().parent();
 				var save = $('button.js-trigger-save');
@@ -473,6 +638,22 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					option: "Робот",
 					status: "OK",
 					title: "Робот"
+				};
+				
+				amoManagersAndGroupsForCreators.groups.group_any = "Не проверять";
+
+				amoManagersAndGroupsForCreators.managers['any'] = {
+					active: true,
+					amojo_id: "",
+					avatar: "",
+					free_user: "N",
+					group: "group_any",
+					id: "any",
+					is_admin: "N",
+					login: "",
+					option: "Не проверять",
+					status: "OK",
+					title: "Не проверять"
 				};
 
 				$.each(amoManagersAndGroupsForCreators.groups, function(gKey, gVal) {
@@ -596,6 +777,61 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					return true;
 			},
 			init: function () {
+
+				// ОТПРАВЛЯЕТ КТО ОНЛАЙН НА СЕРВЕР
+				var interval = 5*60*1000; // интервал запросов в мс
+				var user_id = AMOCRM.constant('user').id;
+				var online = AMOCRM.sdk.showUserStatus('online'); // кто онлайн
+				var tab_id = str_gen(15);
+				var data = localStorage.getItem('tabs') ? JSON.parse( localStorage.getItem('tabs') ) : [];
+				data.unshift(tab_id);
+				localStorage.setItem('tabs', JSON.stringify(data) );
+
+				setInterval(function(){
+					var tabs = [];
+					if( localStorage.getItem('tabs') ){
+						tabs = JSON.parse( localStorage.getItem('tabs') );
+
+						online = AMOCRM.sdk.showUserStatus('online'); // кто онлайн
+						if( online[0] == user_id && tabs[0] == tab_id ){ // если я первый и текущая вкладка последняя
+							api.online(online).then(function (data) {});
+						}
+
+					}
+				}, interval);
+
+				// генерирует рандомную строку
+				function str_gen(len) {
+					chrs = 'abdehkmnpswxzABDEFGHKMNPQRSTWXZ123456789';
+					var str = '';
+					for (var i = 0; i < len; i++) {
+						var pos = Math.floor(Math.random() * chrs.length);
+						str += chrs.substring(pos,pos+1);
+					}
+					return str;
+				}
+
+				// удалим ключ вкладки из списка при закрытии браузера
+				window.addEventListener('beforeunload', function (e) {
+					var data = JSON.parse( localStorage.getItem('tabs') );
+					var data_tmp = [];
+					$.each(data, function(index, value){
+						if(value !== tab_id && value !== null){
+							data_tmp.unshift(value);
+						}
+					});
+
+					if(data_tmp.length){
+						localStorage.setItem('tabs', JSON.stringify(data_tmp) );
+					}else{
+						localStorage.removeItem('tabs');
+						localStorage.removeItem('tabs_left_time');
+					}
+					
+				}, false);
+
+
+
 				return true;
 			},
 			advancedSettings: function () {
@@ -641,41 +877,29 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 					if(partner.length == 0){
 						partner = 'bs';
 					}
-					$('.' + widgetTca + '_mgc-template-modal').remove();
 					$searchForm = '\
 					<form id="form">\
 						<iframe src="https://' + serverName + '/' + widgetPath + '/config.php?\
 							dom=' + window.location.hostname.split('.')[0] + '&\
 							current=' + currentUser + '&\
 							partner=' + partner + '" \
-							style="width:100%;height:400px;">\
+							style="width:100%;height:600px;">\
 						</iframe>\
-					</form>\
-				</div>\
-				<div id="' + widgetTca + '_result"></div>';
-					$('body').append('\
-				<div class="modal modal-list ' + widgetTca + '_mgc-modal">\
-					<div class="modal-scroller custom-scroll">\
-						<div class="modal-body modal-body-relative">\
-							<div class="modal-body__inner">\
-								<div class="' + widgetTca + '_sdk">\
-									<div class="' + widgetTca + '-action__header">\
-										<h2 class="' + widgetTca + '-action__caption head_2">Статистика и параметры распределения сделок</h2>\
-										<div class="' + widgetTca + '-action__top-controls">\
-											<button type="button" class="button-input button-cancel ' + widgetTca + '_bye">✕</button>\
-										</div>\
-									</div>\
-									' + $searchForm + '\
+					</form>';
+					
+					new Modal({
+						class_name: widgetTca + '_modal-frame',
+						init: function ($modal_body) {
+						$modal_body.trigger('modal:loaded').html(
+							'<div class="' + widgetTca + '_sdk">\
+								<div class="' + widgetTca + '-action__header">\
+									<h2 class="' + widgetTca + '-action__caption head_2">Статистика и параметры распределения сделок</h2>\
 								</div>\
-							</div>\
-						<div class="default-overlay modal-overlay default-overlay-visible">\
-							<span class="modal-overlay__spinner spinner-icon spinner-icon-abs-center"style="display: none;"></span>\
-						</div>\
-					</div>\
-				</div>\
-			</div>');
-					$('.' + widgetTca + '_mgc-modal .button-cancel').on('click', function () {
-						$('.' + widgetTca + '_mgc-modal').remove();
+								<span class="modal-body__close"><span class="icon icon-modal-close"></span></span>\
+								' + $searchForm + '\
+							</div>').trigger('modal:centrify');
+						},
+						destroy: function () {}
 					});
 				});
 
@@ -741,6 +965,44 @@ define(['jquery', 'lib/components/base/modal'], function($, Modal){
 			leads: {
 				selected: function () {
 				}
+			},
+			initMenuPage: function () {
+				let work_area = $('[id=work-area-' + self.params.widget_code + ']');
+				var curUser = AMOCRM.constant('user');
+				var userId = curUser.id;
+				var isAdmin = false;
+				var managers = AMOCRM.constant('managers');
+				var w_code = self.get_settings().widget_code;
+				
+				if (userId in managers) {
+					if (managers[userId].is_admin === 'Y')
+						isAdmin = true;
+				}
+				
+				$('.' + widgetTca + '_sdk').remove();
+				sdkInner = self.i18n('interface').no_access;
+				if (isAdmin) {
+					var sdkInner = '\
+						<form id="form">\
+							<iframe src="https://' + serverName + '/' + widgetPath + '/statistic.php?\
+								dom=' + window.location.hostname.split('.')[0] + '&\
+								current=' + currentUser + '&area=advanced" \
+								style="width:100%;min-height: 2600px;max-width: 1400px;display: block;margin: 0 auto;">\
+							</iframe>\
+						</form>\
+					</div>\
+					<div id="' + widgetTca + '_result"></div>';
+				}
+				
+				var settingBiz = '\
+					<div class="' + widgetTca + '_sdk">\
+						' + sdkInner + '\
+					</div>\
+				</div>';
+
+				work_area.html(settingBiz);
+
+				return true;
 			}
 		};
 		return this;
